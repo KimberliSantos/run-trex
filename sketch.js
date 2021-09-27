@@ -14,6 +14,7 @@ var gameOverImage
 var som;
 var pulo;
 var checkPoint;
+var larguraTela = window.innerWidth;
 
 function reset(){
   pontuacao = 0;
@@ -28,10 +29,10 @@ function reset(){
 
 function cactos() {
   if(frameCount%60 ===0){
-    var cacto = createSprite(600,175,10,40);
+    var cacto = createSprite(larguraTela,175,10,40);
     cacto.velocityX = -(6+pontuacao/60);
     cacto.scale = 0.6;
-    cacto.lifetime = 130;
+    cacto.lifetime = larguraTela;
     
     var numeroObstaculo = Math.round(random(1,6))
     switch(numeroObstaculo){
@@ -56,11 +57,11 @@ function cactos() {
   
 function nuvens() {
   if(frameCount%60 ===0){
-    var nuvem = createSprite(600,50,50,10);
+    var nuvem = createSprite(larguraTela,50,50,10);
     nuvem.velocityX = -5
     nuvem.addImage(imagemNuvem);
     nuvem.y = Math.round(random(15,70))
-    nuvem.lifetime = 115;
+    nuvem.lifetime = larguraTela;
     nuvem.depth = trex.depth;
     
     trex.depth = nuvem.depth +1;
@@ -94,26 +95,26 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(600,200)
+  createCanvas(larguraTela,200)
   
   trex = createSprite(50, 155, 20, 50);
   trex.addAnimation("correndo", trexCorrendo);
   trex.scale = 0.6;
   trex.setCollider("circle",0,0,40);
   trex.addAnimation("morreu", trexMorto);
-  chao = createSprite (300,190,600,20);
+  chao = createSprite (larguraTela/2,190,larguraTela,20);
   chao.addImage("chao",chaoImg);
   chao.x = chao.width/2;
-  chaoInvisivel = createSprite(300,200,600,10);
+  chaoInvisivel = createSprite(larguraTela/2,200,larguraTela,10);
   chaoInvisivel.visible = false;
   
   grupoDeObstaculos = new Group()
   grupoDeNuvens =  new Group()
   
-  reiniciar = createSprite(300,120,40,40);
+  reiniciar = createSprite(larguraTela/2,120,40,40);
   reiniciar.addImage(reiniciarImage);
   reiniciar.visible = false;
-  gameOver = createSprite(300,50,40,40);
+  gameOver = createSprite(larguraTela/2,50,40,40);
   gameOver.addImage(gameOverImage);
   gameOver.visible = false;
   
@@ -143,9 +144,10 @@ function draw() {
        checkPoint.play();
        }
     
-    if (keyDown("space")&& trex.y > 100) {
+    if ((keyDown("space") || touches.length>0) && trex.y > 100) {
       trex.velocityY = -5;
       pulo.play();
+      touches = []
     }
     
     nuvens();
@@ -169,12 +171,14 @@ function draw() {
     grupoDeNuvens.setLifetimeEach(-1);
     
     trex.changeAnimation("morreu",trexMorto);
-    if(mousePressedOver(reiniciar)){
+    if(mousePressedOver(reiniciar)|| touches.length>0){
     reset();
+    touches = []
        }
   } else if(estadoJogo==="inicio"){
-    if(keyDown("space")){
+    if(keyDown("space")|| touches.length>0){
        estadoJogo="jogar";
+       touches = []
        }        
             }
 
